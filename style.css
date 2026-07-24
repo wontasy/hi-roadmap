@@ -1,0 +1,558 @@
+:root {
+  --black: #0b0b0d;
+  --black-soft: #16161a;
+  --panel: #1c1c21;
+  --gold: #d4af37;
+  --gold-light: #f1d97a;
+  --gold-deep: #a8842a;
+  --white: #ffffff;
+  --off-white: #f6f4ee;
+  --gray: #8b8b93;
+  --line: rgba(212, 175, 55, 0.28);
+  --shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--black);
+  color: var(--off-white);
+  font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  min-height: 100vh;
+  gap: 0;
+}
+
+/* ==================== 入力パネル ==================== */
+.input-panel {
+  background: linear-gradient(180deg, #101012 0%, #0b0b0d 100%);
+  border-right: 1px solid var(--line);
+  padding: 36px 30px 40px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.input-panel__brand { margin-bottom: 34px; }
+
+.brand-en {
+  font-family: "Cormorant Garamond", serif;
+  letter-spacing: 0.22em;
+  color: var(--gold);
+  font-size: 13px;
+  margin: 0 0 6px;
+  text-transform: uppercase;
+}
+
+.brand-jp {
+  font-family: "Noto Serif JP", serif;
+  font-size: 22px;
+  line-height: 1.5;
+  margin: 0;
+  color: var(--white);
+  font-weight: 700;
+}
+.brand-jp span {
+  display: block;
+  font-size: 14px;
+  color: var(--gray);
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.field-group { margin-bottom: 26px; }
+
+.field-group label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gold-light);
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+
+.field-value {
+  font-family: "Cormorant Garamond", serif;
+  color: var(--white);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.field-group input[type="text"],
+.field-group input[type="date"],
+.field-group input[type="number"] {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--white);
+  font-size: 16px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.field-group input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(212,175,55,0.18);
+}
+
+.field-group input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--gold-deep), var(--gold));
+  outline: none;
+  margin: 6px 0 4px;
+}
+.field-group input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--white);
+  border: 3px solid var(--gold);
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+.field-group input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--white);
+  border: 3px solid var(--gold);
+  cursor: pointer;
+}
+
+.range-scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--gray);
+}
+
+.field-sub {
+  margin: 6px 2px 0;
+  font-size: 12px;
+  color: var(--gray);
+}
+
+.pdf-button {
+  width: 100%;
+  margin-top: 8px;
+  padding: 16px 12px;
+  background: linear-gradient(135deg, var(--gold-light), var(--gold) 55%, var(--gold-deep));
+  border: none;
+  border-radius: 8px;
+  color: #1a1204;
+  font-weight: 900;
+  font-size: 15px;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(212,175,55,0.28);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.pdf-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 26px rgba(212,175,55,0.4);
+}
+.pdf-button:active { transform: translateY(0); }
+.mobile-only { display: none; }
+
+.input-panel__note {
+  margin-top: 22px;
+  font-size: 12px;
+  color: var(--gray);
+  line-height: 1.6;
+}
+
+/* ==================== レポート ==================== */
+.report {
+  padding: 48px 56px 70px;
+  max-width: 1080px;
+  background-color: var(--black);
+  background-image: radial-gradient(circle at 90% -10%, rgba(212,175,55,0.10), transparent 45%);
+}
+
+.section-label {
+  font-family: "Cormorant Garamond", serif;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 13px;
+  color: var(--gold);
+  margin: 0 0 14px;
+}
+
+/* --- ヘッダー --- */
+.report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 26px;
+  margin-bottom: 34px;
+}
+.report-header__eyebrow {
+  font-family: "Cormorant Garamond", serif;
+  letter-spacing: 0.3em;
+  color: var(--gold);
+  font-size: 13px;
+  margin: 0 0 10px;
+}
+.report-header__name {
+  font-family: "Noto Serif JP", serif;
+  font-size: 34px;
+  font-weight: 900;
+  color: var(--white);
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+.report-header__meta { text-align: right; }
+.report-header__title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--gold-light);
+  margin: 0 0 8px;
+  letter-spacing: 0.05em;
+}
+.report-header__date {
+  font-size: 13px;
+  color: var(--gray);
+  margin: 0;
+}
+
+/* --- ゴールカード --- */
+.goal-card {
+  background: linear-gradient(160deg, var(--panel), #0e0e11);
+  border: 1px solid var(--gold);
+  border-radius: 16px;
+  padding: 30px 34px;
+  margin-bottom: 28px;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+.goal-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(212,175,55,0.12), transparent 40%);
+  pointer-events: none;
+}
+.goal-card__label {
+  font-family: "Cormorant Garamond", serif;
+  letter-spacing: 0.25em;
+  color: var(--gold);
+  font-size: 13px;
+  margin: 0 0 16px;
+  text-transform: uppercase;
+}
+.goal-card__body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.goal-card__combo {
+  font-size: 30px;
+  font-weight: 900;
+  color: var(--white);
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+}
+.goal-card__combo .pack-chip {
+  display: inline-block;
+  background: rgba(212,175,55,0.14);
+  border: 1px solid var(--gold);
+  color: var(--gold-light);
+  padding: 4px 14px;
+  border-radius: 999px;
+  margin: 4px 6px 4px 0;
+  font-size: 22px;
+}
+.goal-card__stats {
+  display: flex;
+  gap: 30px;
+}
+.goal-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 110px;
+  padding: 12px 18px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 10px;
+  border: 1px solid var(--line);
+}
+.goal-stat__num {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 34px;
+  font-weight: 700;
+  color: var(--gold);
+}
+.goal-stat__unit {
+  font-size: 12px;
+  color: var(--gray);
+  margin-top: 4px;
+}
+
+/* --- ペース診断 --- */
+.pace-card {
+  border-radius: 16px;
+  padding: 26px 32px;
+  margin-bottom: 34px;
+  border: 1px solid var(--line);
+  background: var(--black-soft);
+}
+.pace-card.is-good {
+  border-color: #4caf7d;
+  background: linear-gradient(160deg, rgba(76,175,125,0.10), var(--black-soft));
+}
+.pace-card.is-warning {
+  border-color: #e0763a;
+  background: linear-gradient(160deg, rgba(224,118,58,0.12), var(--black-soft));
+}
+.pace-card__label {
+  font-family: "Cormorant Garamond", serif;
+  letter-spacing: 0.25em;
+  color: var(--gold);
+  font-size: 13px;
+  margin: 0 0 10px;
+  text-transform: uppercase;
+}
+.pace-card__status {
+  font-size: 21px;
+  font-weight: 900;
+  margin: 0 0 8px;
+  color: var(--white);
+}
+.pace-card__advice {
+  font-size: 15px;
+  color: var(--off-white);
+  margin: 0;
+  line-height: 1.7;
+}
+
+/* --- グラフ --- */
+.chart-card {
+  background: var(--black-soft);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 28px 30px 18px;
+  margin-bottom: 34px;
+}
+.chart-wrap { position: relative; width: 100%; }
+
+/* --- グラフのPDF出力用フォールバック（CSSベースの静止棒グラフ） --- */
+/* html2pdf内蔵のhtml2canvasはライブのChart.js canvasを安定して複製できないため、
+   PDF出力の瞬間だけ canvas を隠し、このDOMベースの棒グラフを表示して撮影する。 */
+.chart-pdf-fallback { display: none; }
+.chart-pdf-fallback.is-active { display: block; }
+.chart-pdf-fallback__plot {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 220px;
+  padding: 24px 10px 0;
+  border-bottom: 2px solid var(--line);
+}
+.pdf-bar-col {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  min-width: 0;
+}
+.pdf-bar-value {
+  font-size: 10px;
+  color: var(--gray);
+  margin-bottom: 4px;
+  white-space: nowrap;
+}
+.pdf-bar {
+  width: 100%;
+  max-width: 26px;
+  background: rgba(212, 175, 55, 0.35);
+  border: 1px solid rgba(212, 175, 55, 0.5);
+  border-radius: 4px 4px 0 0;
+}
+.pdf-bar-col.is-achieved .pdf-bar {
+  background: var(--gold);
+  border-color: var(--gold-light);
+}
+.pdf-bar-col.is-achieved .pdf-bar-value {
+  color: var(--gold);
+  font-weight: 700;
+}
+.pdf-bar-label {
+  font-size: 10px;
+  color: var(--gray);
+  margin-top: 8px;
+  white-space: nowrap;
+}
+.pdf-target-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 2px dashed var(--gold);
+}
+.pdf-target-line span {
+  position: absolute;
+  right: 0;
+  top: -18px;
+  background: var(--gold);
+  color: #1a1204;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.chart-pdf-fallback__legend {
+  display: flex;
+  gap: 24px;
+  margin-top: 16px;
+  font-size: 12px;
+  color: var(--off-white);
+}
+.legend-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+.legend-dot--bar { background: rgba(212, 175, 55, 0.35); border: 1px solid rgba(212, 175, 55, 0.5); }
+.legend-dot--target { background: var(--gold); }
+
+/* --- タイムライン --- */
+.timeline-card {
+  background: var(--black-soft);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 28px 30px;
+  margin-bottom: 30px;
+}
+.table-wrap { width: 100%; overflow-x: auto; }
+
+.timeline-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  min-width: 760px;
+}
+.timeline-table thead th {
+  text-align: center;
+  color: var(--gold-light);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 10px 8px;
+  border-bottom: 2px solid var(--gold);
+  white-space: nowrap;
+}
+.timeline-table tbody td {
+  text-align: center;
+  padding: 13px 8px;
+  border-bottom: 1px solid var(--line);
+  color: var(--off-white);
+  vertical-align: middle;
+}
+.timeline-table tbody tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+.timeline-table tbody tr.is-achieved {
+  background: rgba(212,175,55,0.16);
+  box-shadow: inset 0 0 0 1px var(--gold);
+}
+.timeline-table td.cell-cycle {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--gold);
+}
+.timeline-table td.cell-combo { text-align: left; font-weight: 600; }
+.pack-tag {
+  display: inline-block;
+  background: rgba(212,175,55,0.12);
+  border: 1px solid var(--line);
+  color: var(--gold-light);
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  margin: 2px 4px 2px 0;
+  white-space: nowrap;
+}
+.achieved-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 9px;
+  background: var(--gold);
+  color: #1a1204;
+  font-size: 11px;
+  font-weight: 900;
+  border-radius: 999px;
+  letter-spacing: 0.03em;
+}
+
+/* --- 免責事項 --- */
+.disclaimer {
+  font-size: 12px;
+  color: var(--gray);
+  line-height: 1.8;
+  border-top: 1px solid var(--line);
+  padding-top: 18px;
+  margin-top: 10px;
+}
+
+/* ==================== レスポンシブ ==================== */
+@media (max-width: 1024px) {
+  .app { grid-template-columns: 1fr; }
+  .input-panel { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--line); }
+  .report { padding: 32px 20px 50px; max-width: 100%; }
+  .report-header { flex-direction: column; align-items: flex-start; gap: 14px; }
+  .report-header__meta { text-align: left; }
+  .goal-card__body { flex-direction: column; align-items: flex-start; }
+}
+
+/* ==================== 印刷 / PDF最適化 ==================== */
+@media print {
+  .no-print { display: none !important; }
+  html, body { background: #ffffff !important; }
+  .app { display: block; }
+  .report {
+    background: #ffffff !important;
+    color: #111111 !important;
+    padding: 0;
+    max-width: 100%;
+  }
+  .section-label { color: #a8842a !important; }
+  .report-header { border-bottom-color: #a8842a; }
+  .report-header__name { color: #111111 !important; }
+  .goal-card, .pace-card, .chart-card, .timeline-card {
+    background: #fbf9f3 !important;
+    border-color: #a8842a !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .goal-card__combo, .pace-card__status { color: #111111 !important; }
+  .timeline-table tbody td, .timeline-table thead th { color: #111111 !important; }
+  .timeline-table tbody tr { break-inside: avoid; page-break-inside: avoid; }
+  .disclaimer { color: #555555 !important; }
+}
