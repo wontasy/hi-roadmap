@@ -155,7 +155,7 @@
 
   /* ==================== レンダリング ==================== */
   function render() {
-    const studentName = el.studentName.value.trim() || "生徒";
+    const studentName = el.studentName.value.trim() || "サンプル";
     const createdDate = el.createdDate.value;
     const targetMonthlyProfit = Number(el.targetProfit.value);
     const targetMonths = Number(el.targetMonths.value);
@@ -351,7 +351,7 @@
 
   /* ==================== PDF出力 ==================== */
   el.pdfButton.addEventListener("click", async () => {
-    const studentName = el.studentName.value.trim() || "生徒";
+    const studentName = el.studentName.value.trim() || "サンプル";
     const dateStr = el.createdDate.value || new Date().toISOString().slice(0, 10);
     const reportEl = document.getElementById("report");
 
