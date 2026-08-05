@@ -354,11 +354,10 @@ html, body {
   padding: 28px 30px 18px;
   margin-bottom: 34px;
 }
-.chart-wrap { position: relative; width: 100%; }
 
 /* --- グラフのPDF出力用フォールバック（CSSベースの静止棒グラフ） --- */
-/* html2pdf内蔵のhtml2canvasはライブのChart.js canvasを安定して複製できないため、
-   PDF出力の瞬間だけ canvas を隠し、このDOMベースの棒グラフを表示して撮影する。 */
+/* html2pdf内蔵のhtml2canvasはライブのSVGを安定して複製できないため、
+   PDF出力の瞬間だけ画面表示側を隠し、このDOMベースの棒グラフを表示して撮影する。 */
 .chart-pdf-fallback { display: none; }
 .chart-pdf-fallback.is-active { display: block; }
 .chart-pdf-fallback__plot {
@@ -366,8 +365,8 @@ html, body {
   display: flex;
   align-items: flex-end;
   gap: 8px;
-  height: 220px;
-  padding: 24px 10px 0;
+  height: 190px;
+  padding: 22px 10px 0;
   border-bottom: 2px solid var(--line);
 }
 .pdf-bar-col {
@@ -472,74 +471,6 @@ html, body {
 }
 .profit-value-label.is-achieved { fill: var(--gold); font-weight: 900; }
 
-/* --- タイムライン --- */
-.timeline-card {
-  background: var(--black-soft);
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 28px 30px;
-  margin-bottom: 30px;
-}
-.table-wrap { width: 100%; overflow-x: auto; }
-
-.timeline-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 16px;
-  min-width: 820px;
-}
-.timeline-table thead th {
-  text-align: center;
-  color: var(--gold-light);
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  padding: 10px 8px;
-  border-bottom: 2px solid var(--gold);
-  white-space: nowrap;
-}
-.timeline-table tbody td {
-  text-align: center;
-  padding: 13px 8px;
-  border-bottom: 1px solid var(--line);
-  color: var(--off-white);
-  vertical-align: middle;
-}
-.timeline-table tbody tr:nth-child(even) { background: rgba(255,255,255,0.02); }
-.timeline-table tbody tr.is-achieved {
-  background: rgba(212,175,55,0.16);
-  box-shadow: inset 0 0 0 1px var(--gold);
-}
-.timeline-table td.cell-cycle {
-  font-family: "Cormorant Garamond", serif;
-  font-size: 21px;
-  font-weight: 700;
-  color: var(--gold);
-}
-.timeline-table td.cell-combo { text-align: left; font-weight: 600; }
-.pack-tag {
-  display: inline-block;
-  background: rgba(212,175,55,0.12);
-  border: 1px solid var(--line);
-  color: var(--gold-light);
-  padding: 3px 10px;
-  border-radius: 999px;
-  font-size: 14px;
-  margin: 2px 4px 2px 0;
-  white-space: nowrap;
-}
-.achieved-badge {
-  display: inline-block;
-  margin-left: 6px;
-  padding: 3px 10px;
-  background: var(--gold);
-  color: #1a1204;
-  font-size: 12.5px;
-  font-weight: 900;
-  border-radius: 999px;
-  letter-spacing: 0.03em;
-}
-
 /* --- 免責事項 --- */
 .disclaimer {
   font-size: 13px;
@@ -574,7 +505,7 @@ html, body {
   .section-label { color: #a8842a !important; }
   .report-header { border-bottom-color: #a8842a; }
   .report-header__name { color: #111111 !important; }
-  .goal-card, .pace-card, .chart-card, .timeline-card {
+  .goal-card, .pace-card, .chart-card {
     background: #fbf9f3 !important;
     border-color: #a8842a !important;
     box-shadow: none !important;
@@ -582,9 +513,19 @@ html, body {
     page-break-inside: avoid;
   }
   .goal-card__combo, .pace-card__status { color: #111111 !important; }
-  .timeline-table tbody td, .timeline-table thead th { color: #111111 !important; }
-  .timeline-table tbody tr { break-inside: avoid; page-break-inside: avoid; }
   .disclaimer { color: #555555 !important; }
+
+  /* PDFは1回きりの提示物のため全体を1ページに収め、改ページの不安定さを避ける */
+  .report-header { padding-bottom: 16px; margin-bottom: 18px; }
+  .goal-card { padding: 20px 26px; margin-bottom: 16px; }
+  .goal-card__label { margin-bottom: 10px; }
+  .goal-card__body { gap: 14px; }
+  .goal-stat { padding: 10px 16px; }
+  .pace-card { padding: 16px 24px; margin-bottom: 16px; }
+  .pace-card__label { margin-bottom: 6px; }
+  .chart-card { padding: 18px 22px 10px; margin-bottom: 16px; }
+  .section-label { margin-bottom: 8px; }
+  .disclaimer { padding-top: 12px; margin-top: 6px; }
 
   .profit-grid-line { stroke: rgba(0,0,0,0.08) !important; }
   .profit-baseline { stroke: rgba(0,0,0,0.2) !important; }

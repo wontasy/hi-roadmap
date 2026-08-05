@@ -8,6 +8,10 @@
   const UNIT = 110000;             // 11万円あたり
   const ITEMS_PER_UNIT = 5;        // 11万円あたり約5個
 
+  // 卸パックの性質上、月利は際限なく伸びるものではないため、
+  // 1サイクルで発注に回せる金額に上限を設け、月利は目安30万円強で頭打ちになるようにする。
+  const ORDER_CAPITAL_CAP = 3200000; // 1サイクルあたりの発注上限（円）
+
   const MAX_CYCLES = 60;           // シミュレーション上限（安全弁）
   const EXTRA_SEARCH_MAX = 5000000; // 追加資金アドバイスの探索上限（円）
 
@@ -33,21 +37,12 @@
     paceCard: document.getElementById("paceCard"),
     paceStatus: document.getElementById("paceStatus"),
     paceAdvice: document.getElementById("paceAdvice"),
-    timelineBody: document.getElementById("timelineBody"),
-    chartCanvas: document.getElementById("capitalChart"),
-    chartPdfFallback: document.getElementById("chartPdfFallback"),
-    chartPdfPlot: document.getElementById("chartPdfPlot"),
     profitChartWrap: document.getElementById("profitChartWrap"),
     profitChartPdfFallback: document.getElementById("profitChartPdfFallback"),
     profitChartPdfPlot: document.getElementById("profitChartPdfPlot"),
   };
 
-  let chartInstance = null;
-
   /* ==================== フォーマッタ ==================== */
-  function formatYen(n) {
-    return Math.round(n).toLocaleString("ja-JP") + "円";
-  }
   function formatMan(n) {
     const man = n / 10000;
     const rounded = Math.round(man * 10) / 10;
@@ -64,10 +59,6 @@
     return combo
       .map((c) => `<span class="pack-chip">${formatMan(c.pack)} × ${c.count}</span>`)
       .join("");
-  }
-  function comboToTags(combo) {
-    if (!combo.length) return '<span class="pack-tag">資金確保中</span>';
-    return combo.map((c) => `<span class="pack-tag">${formatMan(c.pack)}×${c.count}</span>`).join("");
   }
 
   /* ==================== シミュレーションコア ==================== */
@@ -87,13 +78,17 @@
   }
 
   // 1サイクル = 2ヶ月。利益は全額再投資、追加資金は「追加資金×2ヶ月分」を毎サイクル加算。
+  // 発注に回せる金額はORDER_CAPITAL_CAPで頭打ちにし、それを超える分はプールに待機させる
+  // （卸パックの性質上、月利が際限なく伸び続けるわけではないことを表現）。
   function runSimulation(initialCapital, monthlyAdditional, maxCycles) {
     const rows = [];
     let pool = initialCapital;
 
     for (let cycle = 1; cycle <= maxCycles; cycle++) {
       const capitalAtStart = pool + monthlyAdditional * CYCLE_MONTHS;
-      const { combo, orderAmount, leftover } = greedyCombo(capitalAtStart);
+      const orderCapital = Math.min(capitalAtStart, ORDER_CAPITAL_CAP);
+      const { combo, orderAmount } = greedyCombo(orderCapital);
+      const leftover = capitalAtStart - orderAmount;
       const profit = orderAmount * PROFIT_MARGIN;
       const monthlyProfit = profit / CYCLE_MONTHS;
       const items = Math.round((orderAmount / UNIT) * ITEMS_PER_UNIT);
@@ -219,57 +214,13 @@
       }
     }
 
-    // ---- タイムライン ----
-    el.timelineBody.innerHTML = timeline
-      .map((r, i) => {
-        const isAchieved = i === achievedIdx;
-        return `
-        <tr class="${isAchieved ? "is-achieved" : ""}">
-          <td class="cell-cycle">${r.cycle}</td>
-          <td>${r.monthStart}〜${r.monthEnd}ヶ月目</td>
-          <td class="cell-combo">${comboToTags(r.combo)}${isAchieved ? '<span class="achieved-badge">目標達成</span>' : ""}</td>
-          <td>${formatMan(r.leftover)}</td>
-          <td>${formatMan(r.profit)}</td>
-          <td>${formatMan(r.monthlyProfit)} / 月</td>
-          <td>約${r.items}個 / サイクル</td>
-        </tr>`;
-      })
-      .join("");
-
     // ---- グラフ ----
-    renderChart(timeline, achievedIdx, targetMonthlyProfit, targetMonths);
-    renderChartPdfFallback(timeline, achievedIdx);
     renderProfitChart(timeline, achievedIdx, targetMonthlyProfit);
     renderProfitChartPdfFallback(timeline, achievedIdx, targetMonthlyProfit);
   }
 
-  /* ==================== グラフ（月次利益の推移／PDF出力用フォールバック） ==================== */
-  // 画面表示はSVGの折れ線グラフだが、html2pdf内蔵のhtml2canvasはSVGも
-  // 安定して複製できないため（Chart.js canvasと同様の既知の問題）、
-  // PDF出力時だけ資金推移グラフと同じCSSベースの静止棒グラフに差し替えて撮影する。
-  function renderProfitChartPdfFallback(timeline, achievedIdx, targetMonthlyProfit) {
-    const maxVal = Math.max(targetMonthlyProfit, ...timeline.map((r) => r.monthlyProfit), 1);
-    const targetTopPct = 100 - (targetMonthlyProfit / maxVal) * 100;
-
-    el.profitChartPdfPlot.innerHTML =
-      `<div class="pdf-target-line" style="top:${targetTopPct}%"><span>目標月利ライン</span></div>` +
-      timeline
-        .map((r, i) => {
-          const heightPct = Math.max((r.monthlyProfit / maxVal) * 100, 1);
-          const isAchieved = i === achievedIdx;
-          return `
-          <div class="pdf-bar-col ${isAchieved ? "is-achieved" : ""}">
-            <span class="pdf-bar-value">${formatMan(r.monthlyProfit)}</span>
-            <div class="pdf-bar" style="height:${heightPct}%"></div>
-            <span class="pdf-bar-label">${r.monthEnd}ヶ月</span>
-          </div>`;
-        })
-        .join("");
-  }
-
   /* ==================== グラフ（月次利益の推移／目標到達度） ==================== */
-  // Chart.jsのライブcanvasはPDF出力時に複製できないため使わず、
-  // 画面・PDFの両方でそのまま同じ見た目になるSVGを直接組み立てて描画する。
+  // 画面表示はSVGの折れ線グラフを直接組み立てて描画する。
   function buildProfitChartSvg(timeline, achievedIdx, targetMonthlyProfit) {
     const n = timeline.length;
     if (n === 0) return "";
@@ -279,11 +230,11 @@
     const maxY = maxRaw * 1.2;
 
     const W = 760;
-    const H = 270;
+    const H = 230;
     const padL = 20;
     const padR = 20;
-    const padT = 40;
-    const padB = 38;
+    const padT = 36;
+    const padB = 34;
     const innerW = W - padL - padR;
     const innerH = H - padT - padB;
 
@@ -341,152 +292,27 @@
     el.profitChartWrap.innerHTML = buildProfitChartSvg(timeline, achievedIdx, targetMonthlyProfit);
   }
 
-  /* ==================== グラフ（PDF出力用フォールバック） ==================== */
-  // html2pdf内蔵のhtml2canvasはライブのChart.js canvasを安定して複製できないため、
-  // PDF出力時だけ、このCSSベースの静止棒グラフに差し替えて撮影する。
-  function renderChartPdfFallback(timeline, achievedIdx) {
-    const maxVal = Math.max(...timeline.map((r) => r.poolAfter), 1);
-    const targetLevel = achievedIdx >= 0 ? timeline[achievedIdx].poolAfter : null;
-    const targetTopPct = targetLevel !== null ? 100 - (targetLevel / maxVal) * 100 : null;
+  /* ==================== グラフ（月次利益の推移／PDF出力用フォールバック） ==================== */
+  // html2pdf内蔵のhtml2canvasはSVGを安定して複製できないため（既知の問題）、
+  // PDF出力時だけこのCSSベースの静止棒グラフに差し替えて撮影する。
+  function renderProfitChartPdfFallback(timeline, achievedIdx, targetMonthlyProfit) {
+    const maxVal = Math.max(targetMonthlyProfit, ...timeline.map((r) => r.monthlyProfit), 1);
+    const targetTopPct = 100 - (targetMonthlyProfit / maxVal) * 100;
 
-    el.chartPdfPlot.innerHTML =
-      (targetTopPct !== null
-        ? `<div class="pdf-target-line" style="top:${targetTopPct}%"><span>目標達成ライン</span></div>`
-        : "") +
+    el.profitChartPdfPlot.innerHTML =
+      `<div class="pdf-target-line" style="top:${targetTopPct}%"><span>目標月利ライン</span></div>` +
       timeline
         .map((r, i) => {
-          const heightPct = Math.max((r.poolAfter / maxVal) * 100, 1);
+          const heightPct = Math.max((r.monthlyProfit / maxVal) * 100, 1);
           const isAchieved = i === achievedIdx;
           return `
           <div class="pdf-bar-col ${isAchieved ? "is-achieved" : ""}">
-            <span class="pdf-bar-value">${formatMan(r.poolAfter)}</span>
+            <span class="pdf-bar-value">${formatMan(r.monthlyProfit)}</span>
             <div class="pdf-bar" style="height:${heightPct}%"></div>
             <span class="pdf-bar-label">${r.monthEnd}ヶ月</span>
           </div>`;
         })
         .join("");
-  }
-
-  /* ==================== グラフ描画 ==================== */
-  function renderChart(timeline, achievedIdx, targetMonthlyProfit, targetMonths) {
-    const ctx = document.getElementById("capitalChart").getContext("2d");
-
-    const points = timeline.map((r) => ({ x: r.monthEnd, y: Math.round(r.poolAfter) }));
-    const barColors = timeline.map((_, i) => (i === achievedIdx ? "#d4af37" : "rgba(212,175,55,0.35)"));
-    const barBorders = timeline.map((_, i) => (i === achievedIdx ? "#f1d97a" : "rgba(212,175,55,0.5)"));
-
-    const achievedPoint =
-      achievedIdx >= 0 && achievedIdx < timeline.length
-        ? [{ x: timeline[achievedIdx].monthEnd, y: Math.round(timeline[achievedIdx].poolAfter) }]
-        : [];
-
-    const annotations = {};
-    if (achievedIdx >= 0 && achievedIdx < timeline.length) {
-      annotations.targetLevelLine = {
-        type: "line",
-        yMin: Math.round(timeline[achievedIdx].poolAfter),
-        yMax: Math.round(timeline[achievedIdx].poolAfter),
-        borderColor: "#d4af37",
-        borderWidth: 2,
-        borderDash: [6, 6],
-        label: {
-          enabled: true,
-          content: "目標達成資金ライン",
-          position: "start",
-          backgroundColor: "#d4af37",
-          color: "#1a1204",
-          font: { weight: "bold", size: 13 },
-        },
-      };
-    }
-    annotations.targetMonthLine = {
-      type: "line",
-      xMin: targetMonths,
-      xMax: targetMonths,
-      borderColor: "#e0763a",
-      borderWidth: 2,
-      borderDash: [4, 4],
-      label: {
-        enabled: true,
-        content: `目標時期（${targetMonths}ヶ月）`,
-        position: "end",
-        backgroundColor: "#e0763a",
-        color: "#fff",
-        font: { weight: "bold", size: 13 },
-      },
-    };
-
-    if (chartInstance) chartInstance.destroy();
-
-    chartInstance = new Chart(ctx, {
-      data: {
-        datasets: [
-          {
-            type: "bar",
-            label: "資金（プール／サイクル終了時点）",
-            data: points,
-            backgroundColor: barColors,
-            borderColor: barBorders,
-            borderWidth: 1.5,
-            borderRadius: 4,
-            barThickness: 26,
-            order: 2,
-          },
-          {
-            type: "scatter",
-            label: "目標達成ポイント",
-            data: achievedPoint,
-            backgroundColor: "#fff2c2",
-            borderColor: "#d4af37",
-            borderWidth: 2,
-            pointStyle: "star",
-            pointRadius: 11,
-            pointHoverRadius: 13,
-            order: 1,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: { mode: "index", intersect: false },
-        scales: {
-          x: {
-            type: "linear",
-            min: 0,
-            title: { display: true, text: "経過月数", color: "#8b8b93", font: { size: 13 } },
-            ticks: {
-              stepSize: CYCLE_MONTHS,
-              color: "#c9c9cf",
-              font: { size: 13 },
-              callback: (v) => `${v}ヶ月`,
-            },
-            grid: { color: "rgba(255,255,255,0.06)" },
-          },
-          y: {
-            title: { display: true, text: "資金（円）", color: "#8b8b93", font: { size: 13 } },
-            ticks: {
-              color: "#c9c9cf",
-              font: { size: 13 },
-              callback: (v) => formatMan(v),
-            },
-            grid: { color: "rgba(255,255,255,0.06)" },
-          },
-        },
-        plugins: {
-          legend: {
-            labels: { color: "#f6f4ee", font: { size: 14 } },
-          },
-          tooltip: {
-            callbacks: {
-              title: (items) => `${items[0].parsed.x}ヶ月目`,
-              label: (item) => `${item.dataset.label}: ${formatYen(item.parsed.y)}`,
-            },
-          },
-          annotation: { annotations },
-        },
-      },
-    });
   }
 
   /* ==================== 入力イベント ==================== */
@@ -527,10 +353,11 @@
       pagebreak: { mode: ["css", "avoid-all"] },
     };
 
-    el.chartCanvas.style.display = "none";
-    el.chartPdfFallback.classList.add("is-active");
     el.profitChartWrap.style.display = "none";
     el.profitChartPdfFallback.classList.add("is-active");
+    // クラス切り替え直後はレイアウトが確定していないことがあるため、
+    // 描画が落ち着くのを待ってからキャプチャする（avoid-allの高さ計算がずれるのを防ぐ）。
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
     try {
       await html2pdf().set(opt).from(reportEl).save();
@@ -544,8 +371,6 @@
         el.pdfButton.innerHTML = originalLabel;
       }, 3000);
     } finally {
-      el.chartCanvas.style.display = "";
-      el.chartPdfFallback.classList.remove("is-active");
       el.profitChartWrap.style.display = "";
       el.profitChartPdfFallback.classList.remove("is-active");
     }

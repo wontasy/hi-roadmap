@@ -106,20 +106,6 @@
       <p class="pace-card__advice" id="paceAdvice"></p>
     </section>
 
-    <section class="chart-card">
-      <p class="section-label">資金の増加推移</p>
-      <div class="chart-wrap">
-        <canvas id="capitalChart" height="120"></canvas>
-      </div>
-      <div class="chart-pdf-fallback" id="chartPdfFallback">
-        <div class="chart-pdf-fallback__plot" id="chartPdfPlot"></div>
-        <div class="chart-pdf-fallback__legend">
-          <span><i class="legend-dot legend-dot--bar"></i>資金（プール／サイクル終了時点）</span>
-          <span><i class="legend-dot legend-dot--target"></i>目標達成ライン</span>
-        </div>
-      </div>
-    </section>
-
     <section class="chart-card profit-chart-card">
       <p class="section-label">月次利益の推移（目標月利までの到達度）</p>
       <div class="profit-chart-wrap" id="profitChartWrap"></div>
@@ -132,28 +118,9 @@
       </div>
     </section>
 
-    <section class="timeline-card">
-      <p class="section-label">発注タイムライン（1サイクル＝2ヶ月）</p>
-      <div class="table-wrap">
-        <table class="timeline-table">
-          <thead>
-            <tr>
-              <th>サイクル</th>
-              <th>期間</th>
-              <th>発注パック</th>
-              <th>プール資金<br>（繰越）</th>
-              <th>想定利益<br>（サイクル）</th>
-              <th>月利換算</th>
-              <th>目安の作業量</th>
-            </tr>
-          </thead>
-          <tbody id="timelineBody"></tbody>
-        </table>
-      </div>
-    </section>
-
     <footer class="disclaimer">
       ※利益率20%・全額再投資のシミュレーションであり、将来の利益を保証するものではありません。<br>
+      ※卸パックの性質上、月利は目安30万円強で頭打ちになるようシミュレーションしています。<br>
       ※販売ペースには個人差があります。
     </footer>
 
@@ -161,8 +128,6 @@
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
 <script src="script.js"></script>
 </body>
