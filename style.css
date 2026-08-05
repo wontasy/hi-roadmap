@@ -396,8 +396,8 @@ html, body {
   display: flex;
   align-items: flex-end;
   gap: 8px;
-  height: 190px;
-  padding: 22px 10px 0;
+  height: 155px;
+  padding: 20px 10px 0;
   border-bottom: 2px solid var(--line);
 }
 .pdf-bar-col {
@@ -522,54 +522,70 @@ html, body {
   .goal-card__body { flex-direction: column; align-items: flex-start; }
 }
 
-/* ==================== 印刷 / PDF最適化 ==================== */
-@media print {
-  .no-print { display: none !important; }
-  html, body { background: #ffffff !important; }
-  .app { display: block; }
-  .report {
-    background: #ffffff !important;
-    color: #111111 !important;
-    padding: 0;
-    max-width: 100%;
-  }
-  .section-label { color: #a8842a !important; }
-  .report-header { border-bottom-color: #a8842a; }
-  .report-header__name { color: #111111 !important; }
-  .report-conditions__label { color: #666666 !important; }
-  .report-conditions__value { color: #a8842a !important; }
-  .goal-card, .pace-card, .chart-card {
-    background: #fbf9f3 !important;
-    border-color: #a8842a !important;
-    box-shadow: none !important;
-    break-inside: avoid;
-    page-break-inside: avoid;
-  }
-  .goal-card__combo, .pace-card__status { color: #111111 !important; }
-  .disclaimer { color: #555555 !important; }
-
-  /* PDFは1回きりの提示物のため全体を1ページに収め、改ページの不安定さを避ける */
-  .report-header { padding-bottom: 16px; margin-bottom: 18px; }
-  .goal-card { padding: 20px 26px; margin-bottom: 16px; }
-  .goal-card__label { margin-bottom: 10px; }
-  .goal-card__body { gap: 14px; }
-  .goal-stat { padding: 10px 16px; }
-  .pace-card { padding: 16px 24px; margin-bottom: 16px; }
-  .pace-card__label { margin-bottom: 6px; }
-  .chart-card { padding: 18px 22px 10px; margin-bottom: 16px; }
-  .section-label { margin-bottom: 8px; }
-  .disclaimer { padding-top: 12px; margin-top: 6px; }
-
-  .profit-grid-line { stroke: rgba(0,0,0,0.08) !important; }
-  .profit-baseline { stroke: rgba(0,0,0,0.2) !important; }
-  .profit-area { opacity: 0.5; }
-  .profit-line { stroke: #a8842a !important; }
-  .profit-point { fill: #ffffff !important; stroke: #a8842a !important; }
-  .profit-point.is-achieved { fill: #a8842a !important; stroke: #a8842a !important; }
-  .profit-target-line { stroke: #a8842a !important; }
-  .profit-target-badge-bg { fill: #a8842a !important; }
-  .profit-target-label { fill: #ffffff !important; }
-  .profit-axis-label { fill: #555555 !important; }
-  .profit-value-label { fill: #111111 !important; }
-  .profit-value-label.is-achieved { fill: #a8842a !important; }
+/* ==================== PDF出力用スタイル ====================
+   html2canvasによるキャプチャ時は @media print が確実に適用される保証がないため
+   （実際、avoid-allの副作用に依存していた状態から外れると screen 用スタイルの
+   ままキャプチャされ、PDFが1ページに収まらなくなる不具合が発生した）、
+   PDF出力の瞬間だけ script.js が <body> に .pdf-mode を付与する方式に切り替えている。
+   このブロックを編集する際は script.js 側のクラス切り替え処理も確認すること。 */
+body.pdf-mode { background: #ffffff !important; }
+.pdf-mode .no-print { display: none !important; }
+.pdf-mode .app { display: block; }
+.pdf-mode .report {
+  background: #ffffff !important;
+  color: #111111 !important;
+  padding: 0;
+  max-width: 100%;
 }
+.pdf-mode .section-label { color: #a8842a !important; }
+.pdf-mode .report-header { border-bottom-color: #a8842a; }
+.pdf-mode .report-header__name { color: #111111 !important; }
+.pdf-mode .report-conditions__label { color: #666666 !important; }
+.pdf-mode .report-conditions__value { color: #a8842a !important; }
+.pdf-mode .goal-card,
+.pdf-mode .pace-card,
+.pdf-mode .chart-card {
+  background: #fbf9f3 !important;
+  border-color: #a8842a !important;
+  box-shadow: none !important;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+.pdf-mode .goal-card__combo, .pdf-mode .pace-card__status { color: #111111 !important; }
+.pdf-mode .pace-card__advice { color: #333333 !important; }
+.pdf-mode .goal-card__combo .pack-chip {
+  color: #8a6a1a !important;
+  border-color: #a8842a !important;
+  background: rgba(168, 132, 42, 0.14) !important;
+}
+.pdf-mode .chart-pdf-fallback__legend { color: #333333 !important; }
+.pdf-mode .disclaimer { color: #555555 !important; }
+
+/* PDFは1回きりの提示物のため全体を1ページに収め、改ページの不安定さを避ける */
+.pdf-mode .report-header { padding-bottom: 12px; margin-bottom: 14px; }
+.pdf-mode .report-conditions { margin-bottom: 12px; column-gap: 20px; row-gap: 4px; }
+.pdf-mode .report-conditions__value { font-size: 16px; }
+.pdf-mode .report-conditions__label { font-size: 12px; }
+.pdf-mode .goal-card { padding: 16px 22px; margin-bottom: 12px; }
+.pdf-mode .goal-card__label { margin-bottom: 8px; }
+.pdf-mode .goal-card__body { gap: 12px; }
+.pdf-mode .goal-stat { padding: 8px 14px; }
+.pdf-mode .goal-stat__num { font-size: 38px; }
+.pdf-mode .pace-card { padding: 14px 20px; margin-bottom: 12px; }
+.pdf-mode .pace-card__label { margin-bottom: 4px; }
+.pdf-mode .chart-card { padding: 14px 18px 8px; margin-bottom: 12px; }
+.pdf-mode .section-label { margin-bottom: 6px; }
+.pdf-mode .disclaimer { padding-top: 10px; margin-top: 4px; }
+
+.pdf-mode .profit-grid-line { stroke: rgba(0,0,0,0.08) !important; }
+.pdf-mode .profit-baseline { stroke: rgba(0,0,0,0.2) !important; }
+.pdf-mode .profit-area { opacity: 0.5; }
+.pdf-mode .profit-line { stroke: #a8842a !important; }
+.pdf-mode .profit-point { fill: #ffffff !important; stroke: #a8842a !important; }
+.pdf-mode .profit-point.is-achieved { fill: #a8842a !important; stroke: #a8842a !important; }
+.pdf-mode .profit-target-line { stroke: #a8842a !important; }
+.pdf-mode .profit-target-badge-bg { fill: #a8842a !important; }
+.pdf-mode .profit-target-label { fill: #ffffff !important; }
+.pdf-mode .profit-axis-label { fill: #555555 !important; }
+.pdf-mode .profit-value-label { fill: #111111 !important; }
+.pdf-mode .profit-value-label.is-achieved { fill: #a8842a !important; }

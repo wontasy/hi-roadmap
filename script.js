@@ -372,15 +372,20 @@
       margin: [10, 8, 12, 8],
       filename: `ハイブランド卸ロードマップ_${studentName}_${dateStr}.pdf`,
       image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2, backgroundColor: "#0b0b0d", useCORS: true },
+      html2canvas: { scale: 2, backgroundColor: "#ffffff", useCORS: true },
       jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-      pagebreak: { mode: ["css", "avoid-all"] },
+      // レポートは1ページに収まる分量のため、avoid-allは使わない。
+      // （avoid-allは高さ計算が不安定で、余白の挿入やページ分割・末尾コンテンツの
+      //   欠落を引き起こす既知の問題があるため、不要な場面では使用しない）
+      pagebreak: { mode: ["css"] },
     };
 
+    // @media print はhtml2canvasのキャプチャ時に確実に適用される保証がないため、
+    // PDF出力用の配色・コンパクトな余白は.pdf-modeクラスを明示的に付与して切り替える。
+    document.body.classList.add("pdf-mode");
     el.profitChartWrap.style.display = "none";
     el.profitChartPdfFallback.classList.add("is-active");
-    // クラス切り替え直後はレイアウトが確定していないことがあるため、
-    // 描画が落ち着くのを待ってからキャプチャする（avoid-allの高さ計算がずれるのを防ぐ）。
+    // クラス切り替え直後はレイアウトが確定していないことがあるため、描画が落ち着くのを待つ。
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
     try {
@@ -395,6 +400,7 @@
         el.pdfButton.innerHTML = originalLabel;
       }, 3000);
     } finally {
+      document.body.classList.remove("pdf-mode");
       el.profitChartWrap.style.display = "";
       el.profitChartPdfFallback.classList.remove("is-active");
     }
