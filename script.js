@@ -320,7 +320,7 @@
     el.targetProfitValue.textContent = formatMan(Number(el.targetProfit.value));
     el.targetMonthsValue.textContent = `${el.targetMonths.value}ヶ月後`;
     el.initialCapitalSub.textContent = `＝ ${formatMan(Number(el.initialCapital.value) || 0)}`;
-    el.monthlyAdditionalSub.textContent = `＝ ${formatMan(Number(el.monthlyAdditional.value) || 0)} / 月（給与等からの持ち出し）`;
+    el.monthlyAdditionalSub.textContent = `＝ ${formatMan(Number(el.monthlyAdditional.value) || 0)} / 月`;
   }
 
   function handleInput() {
