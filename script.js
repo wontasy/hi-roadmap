@@ -12,6 +12,10 @@
   // 1サイクルで発注に回せる金額に上限を設け、月利は目安30万円強で頭打ちになるようにする。
   const ORDER_CAPITAL_CAP = 3200000; // 1サイクルあたりの発注上限（円）
 
+  // 初期資金「5万円」は現金プールではなく、入会特典として初回サイクル限定で
+  // 卸値5万円分の商品がそのまま進呈される特別枠（通常の卸パック一覧とは別）。
+  const WELCOME_GIFT_CAPITAL = 50000;
+
   const MAX_CYCLES = 60;           // シミュレーション上限（安全弁）
   const EXTRA_SEARCH_MAX = 5000000; // 追加資金アドバイスの探索上限（円）
 
@@ -57,7 +61,7 @@
   function comboToChips(combo) {
     if (!combo.length) return '<span class="pack-chip">資金確保中（次のサイクルで発注パックが決まります）</span>';
     return combo
-      .map((c) => `<span class="pack-chip">${formatMan(c.pack)} × ${c.count}</span>`)
+      .map((c) => `<span class="pack-chip">${formatMan(c.pack)} × ${c.count}${c.isGift ? "（入会特典）" : ""}</span>`)
       .join("");
   }
 
@@ -82,25 +86,36 @@
   // （卸パックの性質上、月利が際限なく伸び続けるわけではないことを表現）。
   function runSimulation(initialCapital, monthlyAdditional, maxCycles) {
     const rows = [];
-    let pool = initialCapital;
+    // 入会特典（5万円分の商品進呈）は現金プールではないため、資金としては0円スタート扱いにし、
+    // 初回サイクルのみ特典分の発注・利益を別途上乗せする。
+    const isWelcomeGift = initialCapital === WELCOME_GIFT_CAPITAL;
+    let pool = isWelcomeGift ? 0 : initialCapital;
 
     for (let cycle = 1; cycle <= maxCycles; cycle++) {
       const capitalAtStart = pool + monthlyAdditional * CYCLE_MONTHS;
       const orderCapital = Math.min(capitalAtStart, ORDER_CAPITAL_CAP);
       const { combo, orderAmount } = greedyCombo(orderCapital);
       const leftover = capitalAtStart - orderAmount;
-      const profit = orderAmount * PROFIT_MARGIN;
+
+      let finalCombo = combo;
+      let finalOrderAmount = orderAmount;
+      if (isWelcomeGift && cycle === 1) {
+        finalCombo = [{ pack: WELCOME_GIFT_CAPITAL, count: 1, isGift: true }, ...combo];
+        finalOrderAmount = orderAmount + WELCOME_GIFT_CAPITAL;
+      }
+
+      const profit = finalOrderAmount * PROFIT_MARGIN;
       const monthlyProfit = profit / CYCLE_MONTHS;
-      const items = Math.round((orderAmount / UNIT) * ITEMS_PER_UNIT);
-      const poolAfter = capitalAtStart + profit; // 元本回収 + 利益、未使用分もそのままプール
+      const items = Math.round((finalOrderAmount / UNIT) * ITEMS_PER_UNIT);
+      const poolAfter = capitalAtStart + profit; // 元本回収 + 利益（特典分の利益も含む）、未使用分もそのままプール
 
       rows.push({
         cycle,
         monthStart: (cycle - 1) * CYCLE_MONTHS + 1,
         monthEnd: cycle * CYCLE_MONTHS,
         capitalAtStart,
-        combo,
-        orderAmount,
+        combo: finalCombo,
+        orderAmount: finalOrderAmount,
         leftover,
         profit,
         monthlyProfit,
