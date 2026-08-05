@@ -240,6 +240,30 @@ html, body {
   margin: 0;
 }
 
+/* --- 入力条件サマリー --- */
+.report-conditions {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 28px;
+  row-gap: 8px;
+  margin-bottom: 24px;
+}
+.report-conditions__item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
+}
+.report-conditions__label {
+  font-size: 13px;
+  color: var(--gray);
+}
+.report-conditions__value {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--gold-light);
+}
+
 /* --- ゴールカード --- */
 .goal-card {
   background: linear-gradient(160deg, var(--panel), #0e0e11);
@@ -512,6 +536,8 @@ html, body {
   .section-label { color: #a8842a !important; }
   .report-header { border-bottom-color: #a8842a; }
   .report-header__name { color: #111111 !important; }
+  .report-conditions__label { color: #666666 !important; }
+  .report-conditions__value { color: #a8842a !important; }
   .goal-card, .pace-card, .chart-card {
     background: #fbf9f3 !important;
     border-color: #a8842a !important;

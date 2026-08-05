@@ -35,6 +35,10 @@
 
     outStudentName: document.getElementById("outStudentName"),
     outCreatedDate: document.getElementById("outCreatedDate"),
+    outCondTargetProfit: document.getElementById("outCondTargetProfit"),
+    outCondTargetMonths: document.getElementById("outCondTargetMonths"),
+    outCondInitialCapital: document.getElementById("outCondInitialCapital"),
+    outCondMonthlyAdditional: document.getElementById("outCondMonthlyAdditional"),
     outGoalCombo: document.getElementById("outGoalCombo"),
     outGoalMonth: document.getElementById("outGoalMonth"),
     outGoalMonthlyProfit: document.getElementById("outGoalMonthlyProfit"),
@@ -336,6 +340,11 @@
     el.targetMonthsValue.textContent = `${el.targetMonths.value}ヶ月後`;
     el.initialCapitalSub.textContent = `＝ ${formatMan(Number(el.initialCapital.value) || 0)}`;
     el.monthlyAdditionalSub.textContent = `＝ ${formatMan(Number(el.monthlyAdditional.value) || 0)} / 月`;
+
+    el.outCondTargetProfit.textContent = el.targetProfitValue.textContent;
+    el.outCondTargetMonths.textContent = el.targetMonthsValue.textContent;
+    el.outCondInitialCapital.textContent = el.initialCapital.options[el.initialCapital.selectedIndex].text;
+    el.outCondMonthlyAdditional.textContent = el.monthlyAdditional.options[el.monthlyAdditional.selectedIndex].text;
   }
 
   function handleInput() {
