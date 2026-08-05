@@ -185,13 +185,6 @@ html, body {
 .pdf-button:active { transform: translateY(0); }
 .mobile-only { display: none; }
 
-.input-panel__note {
-  margin-top: 22px;
-  font-size: 12px;
-  color: var(--gray);
-  line-height: 1.6;
-}
-
 /* ==================== レポート ==================== */
 .report {
   padding: 48px 56px 70px;
