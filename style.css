@@ -83,10 +83,10 @@ html, body {
 }
 
 .field-value {
-  font-family: "Cormorant Garamond", serif;
+  font-family: "Noto Sans JP", sans-serif;
   color: var(--white);
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 20px;
+  font-weight: 700;
 }
 
 .field-group input[type="text"],
@@ -258,9 +258,9 @@ html, body {
   color: var(--gray);
 }
 .report-conditions__value {
-  font-family: "Cormorant Garamond", serif;
-  font-size: 18px;
-  font-weight: 700;
+  font-family: "Noto Sans JP", sans-serif;
+  font-size: 20px;
+  font-weight: 800;
   color: var(--gold-light);
 }
 
@@ -329,9 +329,9 @@ html, body {
   border: 1px solid var(--line);
 }
 .goal-stat__num {
-  font-family: "Cormorant Garamond", serif;
-  font-size: 42px;
-  font-weight: 700;
+  font-family: "Noto Sans JP", sans-serif;
+  font-size: 46px;
+  font-weight: 900;
   color: var(--gold);
 }
 .goal-stat__unit {
