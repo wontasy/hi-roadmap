@@ -20,7 +20,7 @@ html, body {
   background: var(--black);
   color: var(--off-white);
   font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif;
-  font-size: 16px;
+  font-size: 17px;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -75,7 +75,7 @@ html, body {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--gold-light);
   letter-spacing: 0.04em;
@@ -85,7 +85,7 @@ html, body {
 .field-value {
   font-family: "Cormorant Garamond", serif;
   color: var(--white);
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
 }
 
@@ -98,7 +98,7 @@ html, body {
   border: 1px solid var(--line);
   border-radius: 6px;
   color: var(--white);
-  font-size: 16px;
+  font-size: 17px;
   font-family: inherit;
   outline: none;
   transition: border-color .15s ease, box-shadow .15s ease;
@@ -139,13 +139,13 @@ html, body {
 .range-scale {
   display: flex;
   justify-content: space-between;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--gray);
 }
 
 .field-sub {
   margin: 6px 2px 0;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--gray);
 }
 
@@ -190,7 +190,7 @@ html, body {
   font-family: "Cormorant Garamond", serif;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  font-size: 13px;
+  font-size: 15px;
   color: var(--gold);
   margin: 0 0 14px;
 }
@@ -213,7 +213,7 @@ html, body {
 }
 .report-header__name {
   font-family: "Noto Serif JP", serif;
-  font-size: 34px;
+  font-size: 40px;
   font-weight: 900;
   color: var(--white);
   margin: 0;
@@ -221,14 +221,14 @@ html, body {
 }
 .report-header__meta { text-align: right; }
 .report-header__title {
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 700;
   color: var(--gold-light);
   margin: 0 0 8px;
   letter-spacing: 0.05em;
 }
 .report-header__date {
-  font-size: 13px;
+  font-size: 15px;
   color: var(--gray);
   margin: 0;
 }
@@ -267,7 +267,7 @@ html, body {
   gap: 20px;
 }
 .goal-card__combo {
-  font-size: 30px;
+  font-size: 36px;
   font-weight: 900;
   color: var(--white);
   line-height: 1.4;
@@ -278,10 +278,10 @@ html, body {
   background: rgba(212,175,55,0.14);
   border: 1px solid var(--gold);
   color: var(--gold-light);
-  padding: 4px 14px;
+  padding: 5px 16px;
   border-radius: 999px;
   margin: 4px 6px 4px 0;
-  font-size: 22px;
+  font-size: 26px;
 }
 .goal-card__stats {
   display: flex;
@@ -291,20 +291,20 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 110px;
-  padding: 12px 18px;
+  min-width: 120px;
+  padding: 14px 20px;
   background: rgba(255,255,255,0.03);
   border-radius: 10px;
   border: 1px solid var(--line);
 }
 .goal-stat__num {
   font-family: "Cormorant Garamond", serif;
-  font-size: 34px;
+  font-size: 42px;
   font-weight: 700;
   color: var(--gold);
 }
 .goal-stat__unit {
-  font-size: 12px;
+  font-size: 14px;
   color: var(--gray);
   margin-top: 4px;
 }
@@ -334,13 +334,13 @@ html, body {
   text-transform: uppercase;
 }
 .pace-card__status {
-  font-size: 21px;
+  font-size: 26px;
   font-weight: 900;
   margin: 0 0 8px;
   color: var(--white);
 }
 .pace-card__advice {
-  font-size: 15px;
+  font-size: 18px;
   color: var(--off-white);
   margin: 0;
   line-height: 1.7;
@@ -380,7 +380,7 @@ html, body {
   min-width: 0;
 }
 .pdf-bar-value {
-  font-size: 10px;
+  font-size: 12px;
   color: var(--gray);
   margin-bottom: 4px;
   white-space: nowrap;
@@ -401,7 +401,7 @@ html, body {
   font-weight: 700;
 }
 .pdf-bar-label {
-  font-size: 10px;
+  font-size: 12px;
   color: var(--gray);
   margin-top: 8px;
   white-space: nowrap;
@@ -415,12 +415,12 @@ html, body {
 .pdf-target-line span {
   position: absolute;
   right: 0;
-  top: -18px;
+  top: -20px;
   background: var(--gold);
   color: #1a1204;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
-  padding: 2px 8px;
+  padding: 3px 9px;
   border-radius: 999px;
   white-space: nowrap;
 }
@@ -428,7 +428,7 @@ html, body {
   display: flex;
   gap: 24px;
   margin-top: 16px;
-  font-size: 12px;
+  font-size: 14px;
   color: var(--off-white);
 }
 .legend-dot {
@@ -441,6 +441,36 @@ html, body {
 }
 .legend-dot--bar { background: rgba(212, 175, 55, 0.35); border: 1px solid rgba(212, 175, 55, 0.5); }
 .legend-dot--target { background: var(--gold); }
+
+/* --- 月次利益の推移（SVG折れ線グラフ） --- */
+.profit-chart-wrap { width: 100%; }
+.profit-chart-wrap svg { width: 100%; height: auto; display: block; }
+.profit-grid-line { stroke: rgba(255,255,255,0.06); stroke-width: 1; }
+.profit-baseline { stroke: var(--line); stroke-width: 1; }
+.profit-area { fill: url(#profitAreaGradient); }
+.profit-line { fill: none; stroke: var(--gold); stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
+.profit-point { fill: var(--black-soft); stroke: var(--gold); stroke-width: 2; }
+.profit-point.is-achieved { fill: var(--gold); stroke: var(--gold-light); }
+.profit-target-line { stroke: var(--gold); stroke-width: 2; stroke-dasharray: 6 6; }
+.profit-target-badge-bg { fill: var(--gold); }
+.profit-target-label {
+  fill: #1a1204;
+  font-family: "Noto Sans JP", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+}
+.profit-axis-label {
+  fill: var(--gray);
+  font-family: "Noto Sans JP", sans-serif;
+  font-size: 13px;
+}
+.profit-value-label {
+  fill: var(--off-white);
+  font-family: "Noto Sans JP", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+}
+.profit-value-label.is-achieved { fill: var(--gold); font-weight: 900; }
 
 /* --- タイムライン --- */
 .timeline-card {
@@ -455,13 +485,13 @@ html, body {
 .timeline-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 14px;
-  min-width: 760px;
+  font-size: 16px;
+  min-width: 820px;
 }
 .timeline-table thead th {
   text-align: center;
   color: var(--gold-light);
-  font-size: 12.5px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.02em;
   padding: 10px 8px;
@@ -482,7 +512,7 @@ html, body {
 }
 .timeline-table td.cell-cycle {
   font-family: "Cormorant Garamond", serif;
-  font-size: 18px;
+  font-size: 21px;
   font-weight: 700;
   color: var(--gold);
 }
@@ -492,19 +522,19 @@ html, body {
   background: rgba(212,175,55,0.12);
   border: 1px solid var(--line);
   color: var(--gold-light);
-  padding: 2px 9px;
+  padding: 3px 10px;
   border-radius: 999px;
-  font-size: 12.5px;
+  font-size: 14px;
   margin: 2px 4px 2px 0;
   white-space: nowrap;
 }
 .achieved-badge {
   display: inline-block;
   margin-left: 6px;
-  padding: 2px 9px;
+  padding: 3px 10px;
   background: var(--gold);
   color: #1a1204;
-  font-size: 11px;
+  font-size: 12.5px;
   font-weight: 900;
   border-radius: 999px;
   letter-spacing: 0.03em;
@@ -512,7 +542,7 @@ html, body {
 
 /* --- 免責事項 --- */
 .disclaimer {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--gray);
   line-height: 1.8;
   border-top: 1px solid var(--line);
@@ -555,4 +585,17 @@ html, body {
   .timeline-table tbody td, .timeline-table thead th { color: #111111 !important; }
   .timeline-table tbody tr { break-inside: avoid; page-break-inside: avoid; }
   .disclaimer { color: #555555 !important; }
+
+  .profit-grid-line { stroke: rgba(0,0,0,0.08) !important; }
+  .profit-baseline { stroke: rgba(0,0,0,0.2) !important; }
+  .profit-area { opacity: 0.5; }
+  .profit-line { stroke: #a8842a !important; }
+  .profit-point { fill: #ffffff !important; stroke: #a8842a !important; }
+  .profit-point.is-achieved { fill: #a8842a !important; stroke: #a8842a !important; }
+  .profit-target-line { stroke: #a8842a !important; }
+  .profit-target-badge-bg { fill: #a8842a !important; }
+  .profit-target-label { fill: #ffffff !important; }
+  .profit-axis-label { fill: #555555 !important; }
+  .profit-value-label { fill: #111111 !important; }
+  .profit-value-label.is-achieved { fill: #a8842a !important; }
 }

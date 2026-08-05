@@ -37,6 +37,9 @@
     chartCanvas: document.getElementById("capitalChart"),
     chartPdfFallback: document.getElementById("chartPdfFallback"),
     chartPdfPlot: document.getElementById("chartPdfPlot"),
+    profitChartWrap: document.getElementById("profitChartWrap"),
+    profitChartPdfFallback: document.getElementById("profitChartPdfFallback"),
+    profitChartPdfPlot: document.getElementById("profitChartPdfPlot"),
   };
 
   let chartInstance = null;
@@ -57,13 +60,13 @@
     return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
   }
   function comboToChips(combo) {
-    if (!combo.length) return '<span class="pack-chip">発注なし（資金不足）</span>';
+    if (!combo.length) return '<span class="pack-chip">資金確保中（次のサイクルで発注パックが決まります）</span>';
     return combo
       .map((c) => `<span class="pack-chip">${formatMan(c.pack)} × ${c.count}</span>`)
       .join("");
   }
   function comboToTags(combo) {
-    if (!combo.length) return '<span class="pack-tag">発注なし</span>';
+    if (!combo.length) return '<span class="pack-tag">資金確保中</span>';
     return combo.map((c) => `<span class="pack-tag">${formatMan(c.pack)}×${c.count}</span>`).join("");
   }
 
@@ -173,7 +176,7 @@
       el.outGoalMonth.textContent = goalRow.monthEnd;
       el.outGoalMonthlyProfit.textContent = formatMan(goalRow.monthlyProfit);
     } else {
-      el.outGoalCombo.innerHTML = `<span class="pack-chip">シミュレーション範囲(${MAX_CYCLES * CYCLE_MONTHS}ヶ月)内では未達</span>`;
+      el.outGoalCombo.innerHTML = `<span class="pack-chip">条件を調整すると、目標達成の発注パック構成がここに表示されます</span>`;
       el.outGoalMonth.textContent = "-";
       el.outGoalMonthlyProfit.textContent = "-";
     }
@@ -192,27 +195,27 @@
             : `現在のプランで、目標達成時期ちょうどの${achievedMonth}ヶ月目に目標月利 ${formatMan(targetMonthlyProfit)} を達成できる見込みです。`;
       } else {
         el.paceCard.classList.add("is-warning");
-        el.paceStatus.textContent = "このままでは目標時期に間に合いません。";
+        el.paceStatus.textContent = "あと一歩で目標達成です。";
         const requiredExtra = findRequiredExtra(initialCapital, monthlyAdditional, targetMonthlyProfit, targetMonths);
         if (requiredExtra !== null && requiredExtra > monthlyAdditional) {
           const diffExtra = requiredExtra - monthlyAdditional;
           el.paceAdvice.textContent =
-            `現在のペースだと達成は${achievedMonth}ヶ月目の見込みです。毎月の追加資金をあと${formatMan(diffExtra)}増やす` +
-            `（月々${formatMan(requiredExtra)}に増額）と、${targetMonths}ヶ月後の目標達成が可能になります。`;
+            `現在のペースでは${achievedMonth}ヶ月目に達成の見込みです。毎月の追加資金をあと${formatMan(diffExtra)}増やす` +
+            `（月々${formatMan(requiredExtra)}に増額）と、${targetMonths}ヶ月後の目標達成が見えてきます。`;
         } else {
           el.paceAdvice.textContent =
-            `現在のペースだと達成は${achievedMonth}ヶ月目の見込みです。目標達成時期を${achievedMonth}ヶ月後以降に見直すか、初期資金を増やすことをご検討ください。`;
+            `現在のペースでは${achievedMonth}ヶ月目に達成の見込みです。目標達成時期を${achievedMonth}ヶ月後に設定し直すか、初期資金を増やすと、さらに余裕を持って進められます。`;
         }
       }
     } else {
       el.paceCard.classList.add("is-warning");
-      el.paceStatus.textContent = "現在の条件ではシミュレーション範囲内で目標月利に届きません。";
+      el.paceStatus.textContent = "条件を調整すると、目標月利への到達が見えてきます。";
       const requiredExtra = findRequiredExtra(initialCapital, monthlyAdditional, targetMonthlyProfit, targetMonths);
       if (requiredExtra !== null && requiredExtra > monthlyAdditional) {
         const diffExtra = requiredExtra - monthlyAdditional;
-        el.paceAdvice.textContent = `毎月の追加資金をあと${formatMan(diffExtra)}増やすと、${targetMonths}ヶ月後の目標達成が可能になります。`;
+        el.paceAdvice.textContent = `毎月の追加資金をあと${formatMan(diffExtra)}増やすと、${targetMonths}ヶ月後の目標達成が見えてきます。`;
       } else {
-        el.paceAdvice.textContent = `目標月利または目標達成時期を見直すか、初期資金・追加資金を増やすことをご検討ください。`;
+        el.paceAdvice.textContent = `目標月利または目標達成時期を調整するか、初期資金・追加資金を増やすと、達成プランが見えてきます。`;
       }
     }
 
@@ -236,6 +239,106 @@
     // ---- グラフ ----
     renderChart(timeline, achievedIdx, targetMonthlyProfit, targetMonths);
     renderChartPdfFallback(timeline, achievedIdx);
+    renderProfitChart(timeline, achievedIdx, targetMonthlyProfit);
+    renderProfitChartPdfFallback(timeline, achievedIdx, targetMonthlyProfit);
+  }
+
+  /* ==================== グラフ（月次利益の推移／PDF出力用フォールバック） ==================== */
+  // 画面表示はSVGの折れ線グラフだが、html2pdf内蔵のhtml2canvasはSVGも
+  // 安定して複製できないため（Chart.js canvasと同様の既知の問題）、
+  // PDF出力時だけ資金推移グラフと同じCSSベースの静止棒グラフに差し替えて撮影する。
+  function renderProfitChartPdfFallback(timeline, achievedIdx, targetMonthlyProfit) {
+    const maxVal = Math.max(targetMonthlyProfit, ...timeline.map((r) => r.monthlyProfit), 1);
+    const targetTopPct = 100 - (targetMonthlyProfit / maxVal) * 100;
+
+    el.profitChartPdfPlot.innerHTML =
+      `<div class="pdf-target-line" style="top:${targetTopPct}%"><span>目標月利ライン</span></div>` +
+      timeline
+        .map((r, i) => {
+          const heightPct = Math.max((r.monthlyProfit / maxVal) * 100, 1);
+          const isAchieved = i === achievedIdx;
+          return `
+          <div class="pdf-bar-col ${isAchieved ? "is-achieved" : ""}">
+            <span class="pdf-bar-value">${formatMan(r.monthlyProfit)}</span>
+            <div class="pdf-bar" style="height:${heightPct}%"></div>
+            <span class="pdf-bar-label">${r.monthEnd}ヶ月</span>
+          </div>`;
+        })
+        .join("");
+  }
+
+  /* ==================== グラフ（月次利益の推移／目標到達度） ==================== */
+  // Chart.jsのライブcanvasはPDF出力時に複製できないため使わず、
+  // 画面・PDFの両方でそのまま同じ見た目になるSVGを直接組み立てて描画する。
+  function buildProfitChartSvg(timeline, achievedIdx, targetMonthlyProfit) {
+    const n = timeline.length;
+    if (n === 0) return "";
+
+    const values = timeline.map((r) => r.monthlyProfit);
+    const maxRaw = Math.max(targetMonthlyProfit, ...values, 1);
+    const maxY = maxRaw * 1.2;
+
+    const W = 760;
+    const H = 270;
+    const padL = 20;
+    const padR = 20;
+    const padT = 40;
+    const padB = 38;
+    const innerW = W - padL - padR;
+    const innerH = H - padT - padB;
+
+    const x = (i) => (n <= 1 ? padL + innerW / 2 : padL + i * (innerW / (n - 1)));
+    const y = (v) => padT + innerH - (Math.max(v, 0) / maxY) * innerH;
+
+    const baselineY = y(0);
+    const targetY = y(targetMonthlyProfit);
+
+    const gridLines = [0.25, 0.5, 0.75, 1]
+      .map((f) => {
+        const gy = padT + innerH - f * innerH;
+        return `<line class="profit-grid-line" x1="${padL}" y1="${gy.toFixed(1)}" x2="${W - padR}" y2="${gy.toFixed(1)}"></line>`;
+      })
+      .join("");
+
+    const linePoints = timeline.map((r, i) => `${x(i).toFixed(1)},${y(r.monthlyProfit).toFixed(1)}`).join(" ");
+    const areaPoints = `${x(0).toFixed(1)},${baselineY.toFixed(1)} ${linePoints} ${x(n - 1).toFixed(1)},${baselineY.toFixed(1)}`;
+
+    const pointsMarkup = timeline
+      .map((r, i) => {
+        const isAchieved = i === achievedIdx;
+        const cx = x(i);
+        const cy = y(r.monthlyProfit);
+        return `
+          <text class="profit-value-label${isAchieved ? " is-achieved" : ""}" x="${cx.toFixed(1)}" y="${(cy - 16).toFixed(1)}" text-anchor="middle">${formatMan(r.monthlyProfit)}</text>
+          <circle class="profit-point${isAchieved ? " is-achieved" : ""}" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${isAchieved ? 8 : 5}"></circle>
+          <text class="profit-axis-label" x="${cx.toFixed(1)}" y="${H - padB + 20}" text-anchor="middle">${r.monthEnd}ヶ月</text>`;
+      })
+      .join("");
+
+    const targetLabelWidth = 148;
+    const targetLabelX = Math.min(Math.max(W - padR - targetLabelWidth, padL), W - padR - targetLabelWidth);
+
+    return `
+      <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="月次利益の推移">
+        <defs>
+          <linearGradient id="profitAreaGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#d4af37" stop-opacity="0.45"></stop>
+            <stop offset="100%" stop-color="#d4af37" stop-opacity="0"></stop>
+          </linearGradient>
+        </defs>
+        ${gridLines}
+        <line class="profit-target-line" x1="${padL}" y1="${targetY.toFixed(1)}" x2="${W - padR}" y2="${targetY.toFixed(1)}"></line>
+        <rect class="profit-target-badge-bg" x="${targetLabelX.toFixed(1)}" y="${(targetY - 22).toFixed(1)}" width="${targetLabelWidth}" height="20" rx="10"></rect>
+        <text class="profit-target-label" x="${(targetLabelX + targetLabelWidth / 2).toFixed(1)}" y="${(targetY - 8).toFixed(1)}" text-anchor="middle">目標月利 ${formatMan(targetMonthlyProfit)}</text>
+        <line class="profit-baseline" x1="${padL}" y1="${baselineY.toFixed(1)}" x2="${W - padR}" y2="${baselineY.toFixed(1)}"></line>
+        <polygon class="profit-area" points="${areaPoints}"></polygon>
+        <polyline class="profit-line" points="${linePoints}"></polyline>
+        ${pointsMarkup}
+      </svg>`;
+  }
+
+  function renderProfitChart(timeline, achievedIdx, targetMonthlyProfit) {
+    el.profitChartWrap.innerHTML = buildProfitChartSvg(timeline, achievedIdx, targetMonthlyProfit);
   }
 
   /* ==================== グラフ（PDF出力用フォールバック） ==================== */
@@ -292,7 +395,7 @@
           position: "start",
           backgroundColor: "#d4af37",
           color: "#1a1204",
-          font: { weight: "bold", size: 11 },
+          font: { weight: "bold", size: 13 },
         },
       };
     }
@@ -309,7 +412,7 @@
         position: "end",
         backgroundColor: "#e0763a",
         color: "#fff",
-        font: { weight: "bold", size: 11 },
+        font: { weight: "bold", size: 13 },
       },
     };
 
@@ -351,18 +454,20 @@
           x: {
             type: "linear",
             min: 0,
-            title: { display: true, text: "経過月数", color: "#8b8b93" },
+            title: { display: true, text: "経過月数", color: "#8b8b93", font: { size: 13 } },
             ticks: {
               stepSize: CYCLE_MONTHS,
               color: "#c9c9cf",
+              font: { size: 13 },
               callback: (v) => `${v}ヶ月`,
             },
             grid: { color: "rgba(255,255,255,0.06)" },
           },
           y: {
-            title: { display: true, text: "資金（円）", color: "#8b8b93" },
+            title: { display: true, text: "資金（円）", color: "#8b8b93", font: { size: 13 } },
             ticks: {
               color: "#c9c9cf",
+              font: { size: 13 },
               callback: (v) => formatMan(v),
             },
             grid: { color: "rgba(255,255,255,0.06)" },
@@ -370,7 +475,7 @@
         },
         plugins: {
           legend: {
-            labels: { color: "#f6f4ee", font: { size: 12 } },
+            labels: { color: "#f6f4ee", font: { size: 14 } },
           },
           tooltip: {
             callbacks: {
@@ -424,6 +529,8 @@
 
     el.chartCanvas.style.display = "none";
     el.chartPdfFallback.classList.add("is-active");
+    el.profitChartWrap.style.display = "none";
+    el.profitChartPdfFallback.classList.add("is-active");
 
     try {
       await html2pdf().set(opt).from(reportEl).save();
@@ -439,6 +546,8 @@
     } finally {
       el.chartCanvas.style.display = "";
       el.chartPdfFallback.classList.remove("is-active");
+      el.profitChartWrap.style.display = "";
+      el.profitChartPdfFallback.classList.remove("is-active");
     }
   });
 
