@@ -346,7 +346,7 @@
 
     const opt = {
       margin: [10, 8, 12, 8],
-      filename: `卸パック発注ロードマップ_${studentName}_${dateStr}.pdf`,
+      filename: `ハイブランド卸ロードマップ_${studentName}_${dateStr}.pdf`,
       image: { type: "jpeg", quality: 0.98 },
       html2canvas: { scale: 2, backgroundColor: "#0b0b0d", useCORS: true },
       jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
