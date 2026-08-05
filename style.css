@@ -91,7 +91,8 @@ html, body {
 
 .field-group input[type="text"],
 .field-group input[type="date"],
-.field-group input[type="number"] {
+.field-group input[type="number"],
+.field-group select {
   width: 100%;
   padding: 12px 14px;
   background: var(--panel);
@@ -103,7 +104,17 @@ html, body {
   outline: none;
   transition: border-color .15s ease, box-shadow .15s ease;
 }
-.field-group input:focus {
+.field-group select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23d4af37' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='4 6 8 10 12 6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+  cursor: pointer;
+}
+.field-group input:focus,
+.field-group select:focus {
   border-color: var(--gold);
   box-shadow: 0 0 0 3px rgba(212,175,55,0.18);
 }
